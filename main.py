@@ -1,4 +1,6 @@
 import gymnasium as gym
+import ale_py
+gym.register_envs(ale_py)
 import argparse
 from model import DQN, DuelDQN
 from torch import optim
@@ -60,11 +62,11 @@ def select_action(state:torch.Tensor)->torch.Tensor:
 
 # environment
 if args.env_name == "pong":
-    env = gym.make("PongNoFrameskip-v4")
+    env = gym.make("ALE/Pong-v5")
 elif args.env_name == "breakout":
-    env = gym.make("BreakoutNoFrameskip-v4")
+    env = gym.make("ALE/Pong-v5")
 else:
-    env = gym.make("BoxingNoFrameskip-v4")
+    env = gym.make("ALE/Pong-v5")
 env = AtariWrapper(env)
 
 n_action = env.action_space.n # pong:6; breakout:4; boxing:18
@@ -118,7 +120,7 @@ for epoch in count():
         done = terminated or truncated
         
         # convert to tensor
-        reward = torch.tensor([reward],device=args.gpu) # (1)
+        reward = torch.tensor([reward], dtype=torch.float32, device=args.gpu) # (1)
         done = torch.tensor([done],device=args.gpu) # (1)
         next_obs = torch.from_numpy(next_obs).to(args.gpu) # (84,84)
         next_obs = torch.stack((next_obs,obs[0][0],obs[0][1],obs[0][2])).unsqueeze(0) # (1,4,84,84)
@@ -160,7 +162,7 @@ for epoch in range(args.epoch):
         done = terminated or truncated
         
         # convert to tensor
-        reward = torch.tensor([reward],device=args.gpu) # (1)
+        reward = torch.tensor([reward], dtype=torch.float32, device=args.gpu) # (1)
         done = torch.tensor([done],device=args.gpu) # (1)
         next_obs = torch.from_numpy(next_obs).to(args.gpu) # (84,84)
         next_obs = torch.stack((next_obs,obs[0][0],obs[0][1],obs[0][2])).unsqueeze(0) # (1,4,84,84)
@@ -220,11 +222,11 @@ for epoch in range(args.epoch):
                 with torch.no_grad():
                     video.reset()
                     if args.env_name == "pong":
-                        evalenv = gym.make("PongNoFrameskip-v4")
+                        evalenv = gym.make("ALE/Pong-v5")
                     elif args.env_name == "breakout":
-                        evalenv = gym.make("BreakoutNoFrameskip-v4")
+                        evalenv = gym.make("ALE/Pong-v5")
                     else:
-                        evalenv = gym.make("BoxingNoFrameskip-v4")
+                        evalenv = gym.make("ALE/Pong-v5")
                     evalenv = AtariWrapper(evalenv,video=video)
                     obs, info = evalenv.reset()
                     obs = torch.from_numpy(obs).to(args.gpu)

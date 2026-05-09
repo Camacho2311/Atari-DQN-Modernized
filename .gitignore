@@ -1,2 +1,8 @@
 __pycache__
 log_*
+venv/
+__pycache__/
+*.pyc
+*.pth
+*.mp4
+.DS_Store
